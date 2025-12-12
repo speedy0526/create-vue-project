@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from '@/utils/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
 export enum UserRole {
