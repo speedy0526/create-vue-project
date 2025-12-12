@@ -102,7 +102,7 @@ yarn add -D @biomejs/biome
 
 # 8. 创建项目结构
 print_step "创建项目目录结构"
-mkdir -p src/{components,composables,layouts,pages,router,store,utils,assets,plugins,services,styles/element}
+mkdir -p src/{components,composables,layouts,views,router,store,utils,assets,plugins,services,styles/element}
 mkdir -p public
 
 # 9. 创建配置文件
@@ -127,7 +127,9 @@ export default defineConfig({
       dts: 'src/auto-imports.d.ts',
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({
+        importStyle: "sass",
+      })],
       dts: 'src/components.d.ts',
     })
   ],
@@ -298,7 +300,7 @@ EOF
 print_step "创建核心文件"
 
 #创建数据库连接
-cat > src/services/supabase.ts << 'EOF'
+cat > src/utils/supabase.ts << 'EOF'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -590,7 +592,7 @@ EOF
 # 创建路由配置
 cat > src/router/index.ts << 'EOF'
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '@/pages/HomePage.vue'
+import HomePage from '@/views/HomePage.vue'
 
 const routes = [
   {
@@ -604,7 +606,7 @@ const routes = [
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/pages/AboutPage.vue'),
+    component: () => import('@/views/AboutPage.vue'),
     meta: {
       title: '关于'
     }
@@ -678,7 +680,7 @@ EOF
 print_step "创建页面和组件"
 
 # 创建主页
-cat > src/pages/HomePage.vue << 'EOF'
+cat > src/views/HomePage.vue << 'EOF'
 <template>
   <div class="home-page">
     <el-container>
@@ -742,7 +744,7 @@ cat > src/pages/HomePage.vue << 'EOF'
               <el-steps :active="2" align-center class="demo-steps">
                 <el-step title="安装依赖" description="yarn add" />
                 <el-step title="环境配置" description="配置 .env 文件" />
-                <el-step title="启动项目" description="npm run dev" />
+                <el-step title="启动项目" description="yarn dev" />
               </el-steps>
 
               <div class="action-buttons">
@@ -1059,7 +1061,7 @@ const handleViewDocs = () => {
 EOF
 
 # 创建关于页面
-cat > src/pages/AboutPage.vue << 'EOF'
+cat > src/views/AboutPage.vue << 'EOF'
 <template>
   <div class="about-page">
     <el-container>
@@ -1447,7 +1449,6 @@ cat > package.tmp.json << 'EOF'
     "lint": "biome lint ./src",
     "format:check": "biome format ./src",
     "lint:fix": "biome lint --apply ./src",
-    "prepare": "husky install",
     "postinstall": "echo '请配置 .env 文件中的 Supabase 环境变量'"
   },
   "dependencies": {
@@ -1541,7 +1542,7 @@ VITE_APP_DESCRIPTION=A modern Vue 3 application
 ### 启动开发服务器
 
 \`\`\`bash
-npm run dev
+yarn dev
 # 或
 yarn dev
 # 或
@@ -1559,7 +1560,7 @@ $PROJECT_NAME/
 │   ├── components/      # 组件
 │   ├── composables/     # Vue 组合式函数
 │   ├── layouts/         # 布局组件
-│   ├── pages/           # 页面组件
+│   ├── views/           # 页面组件
 │   ├── router/          # 路由配置
 │   ├── store/           # Vuex 状态管理
 │   ├── styles/          # 样式文件
@@ -1577,14 +1578,14 @@ $PROJECT_NAME/
 
 ## 🛠️ 可用脚本
 
-- \`npm run dev\` - 启动开发服务器
-- \`npm run build\` - 构建生产版本
-- \`npm run preview\` - 预览生产构建
-- \`npm run type-check\` - 类型检查
-- \`npm run format\` - 格式化代码
-- \`npm run lint\` - 代码检查
-- \`npm run lint:fix\` - 自动修复代码问题
-- \`npm run format:check\` - 检查代码格式
+- \`yarn dev\` - 启动开发服务器
+- \`yarn build\` - 构建生产版本
+- \`yarn preview\` - 预览生产构建
+- \`yarn type-check\` - 类型检查
+- \`yarn format\` - 格式化代码
+- \`yarn lint\` - 代码检查
+- \`yarn lint:fix\` - 自动修复代码问题
+- \`yarn format:check\` - 检查代码格式
 
 ## 🎨 UI 组件
 
@@ -1637,15 +1638,6 @@ store.commit('toggleTheme')
 - 代码检查：启用推荐规则
 - 自动修复：支持大部分规则自动修复
 
-### Git Hooks
-
-建议配置 Git Hooks 以确保代码质量：
-
-\`\`\`bash
-npx husky install
-npx husky add .husky/pre-commit "npm run lint"
-npx husky add .husky/pre-push "npm run type-check"
-\`\`\`
 
 ## 📱 响应式设计
 
@@ -2134,7 +2126,7 @@ fi
 
 # 19. 清理并完成
 print_step "安装依赖..."
-yarn add
+yarn
 
 print_step "项目创建完成！🎉"
 echo ""
@@ -2144,17 +2136,17 @@ echo "📁 项目目录: $(pwd)"
 echo ""
 echo "🚀 启动项目:"
 echo "  cd $PROJECT_NAME"
-echo "  npm run dev"
+echo "  yarn dev"
 echo ""
 echo "📋 后续步骤:"
 echo "  1. 复制 .env.example 为 .env.local"
 echo "  2. 配置 Supabase 环境变量"
-echo "  3. 运行 npm run dev 启动开发服务器"
+echo "  3. 运行 yarn dev 启动开发服务器"
 echo "  4. 访问 http://localhost:3000"
 echo ""
 echo "🛠️  代码质量工具:"
-echo "  npm run format    # 格式化代码"
-echo "  npm run lint      # 代码检查"
-echo "  npm run type-check # TypeScript 类型检查"
+echo "  yarn format    # 格式化代码"
+echo "  yarn lint      # 代码检查"
+echo "  yarn type-check # TypeScript 类型检查"
 echo ""
 echo "📚 查看 README.md 获取更多信息"
